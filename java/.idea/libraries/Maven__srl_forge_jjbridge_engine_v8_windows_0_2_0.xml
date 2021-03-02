@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: srl.forge:jjbridge-engine-v8:windows:0.2.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/srl/forge/jjbridge-engine-v8/0.2.0/jjbridge-engine-v8-0.2.0-windows.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/srl/forge/jjbridge-engine-v8/0.2.0/jjbridge-engine-v8-0.2.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/srl/forge/jjbridge-engine-v8/0.2.0/jjbridge-engine-v8-0.2.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

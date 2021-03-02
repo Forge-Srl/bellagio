@@ -1,0 +1,23 @@
+{
+  "name": "bellagio",
+  "version": "0.0.1",
+  "description": "The perfect game for gentlemen",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "code-generation": "bionicjs sync bellagio.bjsconfig.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Forge-Srl/bellagio.git"
+  },
+  "author": "Bellagio Team",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/Forge-Srl/bellagio/issues"
+  },
+  "homepage": "https://github.com/Forge-Srl/bellagio#readme",
+  "devDependencies": {
+    "jest": "^26.6.3"
+  }
+}
