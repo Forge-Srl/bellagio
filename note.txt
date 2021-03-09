@@ -1,0 +1,12 @@
+Algoritmo di ricerca rettangoli:
+- prediligere il cambio di direzione
+- c'è uno stack di direzioni da intraprendere che 
+	- dipende dalle direzioni possibili [DX, B, SX, A DX]
+	- si consuma ad ogni cambio di direzioni 
+	- la prima direzione deve essere duplicata in coda
+- ad ogni nodo con più direzioni possibili devo branchare ricorsivamente 
+	- portandomi dietro lo stack delle direzioni.
+	- ritornando le soluzioni che trovo come array
+- le soluzioni ritornate vanno controllate perchè_
+	- possono essere duplicate
+	- possono contenere segmenti e quindi non sono valide
