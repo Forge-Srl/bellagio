@@ -1,12 +1,6 @@
+const {Segment} = require('./Segment')
+
 class Board {
-
-    static get horizontal() {
-        return 'horizontal'
-    }
-
-    static get vertical() {
-        return 'vertical'
-    }
 
     constructor(height = 10, width = 10) {
         this.size = {height, width}
@@ -14,38 +8,24 @@ class Board {
     }
 
     /**
-     * @param player
-     * @param coordinates {{x: Number, y: Number}}
-     * @param direction
+     * @param segment {Segment}
      * */
-    addSegment(player, coordinates, direction) {
-        if (direction !== Board.horizontal && direction !== Board.vertical) {
-            throw new Error('Invalid direction')
+    addSegment(segment) {
+        if (!segment.isValid(this.size.width, this.size.height)) {
+            throw new Error('Invalid segment')
         }
 
-        if (coordinates.x >= this.size.width || coordinates.y >= this.size.height
-            || coordinates.x < 0 || coordinates.y < 0) {
-            throw new Error('Invalid coordinates')
-        }
-
-        if (coordinates.x === this.size.width - 1 && direction === Board.horizontal
-            || coordinates.y === this.size.height - 1 && direction === Board.vertical) {
-            throw new Error('Invalid direction for these coordinates')
-        }
-
-        this.segments.push({player, coordinates, direction})
+        this.segments.push(segment)
     }
-
-
 
     get squares() {
         const lastSegment = this.segments[this.segments.length - 1]
-        const lastSegmentCoords = this._getSegmentCoords(lastSegment)
+        const segmentPoints = lastSegment.segmentPoints
 
-        const horizontal1 = this._getSquares([], lastSegmentCoords[1], ['W', 'N', 'E', 'S', 'W'])
-        const horizontal2 = this._getSquares([], lastSegmentCoords[1], ['E', 'S', 'W', 'N', 'E'])
-        const vertical1 = this._getSquares([], lastSegmentCoords[1], ['W', 'N', 'E', 'S', 'W'])
-        const vertical2 = this._getSquares([], lastSegmentCoords[1], ['E', 'S', 'W', 'N', 'E'])
+        const horizontal1 = this._getSquares([], segmentPoints[1], ['W'])
+        const horizontal2 = this._getSquares([], segmentPoints[1], ['E'])
+        const vertical1 = this._getSquares([], segmentPoints[1], ['N'])
+        const vertical2 = this._getSquares([], segmentPoints[1], ['S'])
         // ...
         // escludere la direzione inversa al segmento finale
 
@@ -55,49 +35,91 @@ class Board {
         }
     }
 
-    _getSegmentCoords(segment) {
-        if (segment.direction === Board.vertical) {
-            return [segment.coordinates, {x: segment.coordinates.x, y: segment.coordinates.y + 1}]
-        } else {
-            return [segment.coordinates, {x: segment.coordinates.x + 1, y: segment.coordinates.y}]
-        }
-    }
+    _getAdjacentPoints(point) {
+        const adjacentList = this.segments.filter(segment => (segment.startPoint.x === point.x && segment.startPoint.y === point.y) ||
+            (segment.startPoint.x === point.x - 1 && segment.startPoint.y === point.y && segment.isHorizontal) ||
+            (segment.startPoint.x === point.x && segment.startPoint.y === point.y - 1 && segment.isVertical))
 
-    _getAdjacentCoords(node) {
-        const adjacentList = this.segments.filter(segment => (segment.coordinates.x === node.x && segment.coordinates.y === node.y) ||
-            (segment.coordinates.x === node.x - 1 && segment.coordinates.y === node.y && segment.direction === Board.horizontal) ||
-            (segment.coordinates.x === node.x && segment.coordinates.y === node.y - 1 && segment.direction === Board.vertical))
+        const maybeTop = adjacentList.find(adjacentSegment => adjacentSegment.y < point.y)
+        const maybeBottom = adjacentList.find(adjacentSegment => adjacentSegment.y === point.y && adjacentSegment.isVertical)
+        const maybeLeft = adjacentList.find(adjacentSegment => adjacentSegment.x < point.x)
+        const maybeRight = adjacentList.find(adjacentSegment => adjacentSegment.x === point.x && adjacentSegment.isHorizontal)
 
         return {
-            top: adjacentList.find(adjacentSegment => adjacentSegment.y < node.y).coordinates,
-            bottom: this._getSegmentCoords(adjacentList.find(adjacentSegment => adjacentSegment.y === node.y && adjacentSegment.direction === Board.vertical))[1],
-            left: adjacentList.find(adjacentSegment => adjacentSegment.x < node.x).coordinates,
-            right: this._getSegmentCoords(adjacentList.find(adjacentSegment => adjacentSegment.x === node.x && adjacentSegment.direction === Board.horizontal))[1],
+            top: maybeTop ? maybeTop.startPoint : undefined,
+            bottom: maybeBottom ? maybeBottom.segmentPoints[1]: undefined,
+            left: maybeLeft ? maybeLeft.startPoint : undefined,
+            right: maybeRight ? maybeRight.segmentPoints[1] : undefined,
         }
     }
 
-    _getSquares(previousCoordsPath, currentCoords, directionStack) {
-        if (previousCoordsPath.length && previousCoordsPath[0].x === currentCoords.x && previousCoordsPath[0].y === currentCoords.y) {
-            return [{path: previousCoordsPath}]
+    _getSquares(previousPoints, currentPoint, directionStack) {
+        if (previousPoints.length && previousPoints[0].x === currentPoint.x && previousPoints[0].y === currentPoint.y) {
+            return [{path: previousPoints}]
         }
-        if (directionStack.length === 0) {
-            return []
-        }
-        const nextMoves = this._getAdjacentCoords(currentCoords)
 
+        const nextMoves = this._getAdjacentPoints(currentPoint)
         const paths = []
-        if (directionStack[0] === 'E' && nextMoves.right) {
-            paths.push(...this._getSquares([...previousCoordsPath, nextMoves.right], nextMoves.right, directionStack))
-        } else if (directionStack[0] === 'S' && nextMoves.bottom) {
-            paths.push(...this._getSquares([...previousCoordsPath, nextMoves.bottom], nextMoves.bottom, directionStack))
-        } else if (directionStack[0] === 'W' && nextMoves.left) {
-            paths.push(...this._getSquares([...previousCoordsPath, nextMoves.left], nextMoves.left, directionStack))
-        } else if (directionStack[0] === 'N' && nextMoves.top) {
-            paths.push(...this._getSquares([...previousCoordsPath, nextMoves.top], nextMoves.top, directionStack))
-        }
-        //TODO: gestire casi in cui bisogna girare
 
+        if (directionStack[0] === 'E') {
+            let counter = 0
+            if (nextMoves.top && !this._isDirectionAlreadyTaken(directionStack, 'N')) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.top], nextMoves.top, ['N', ...directionStack]))
+                counter++
+            }
+            if (nextMoves.bottom && !this._isDirectionAlreadyTaken(directionStack, 'S')) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.bottom], nextMoves.bottom, ['S', ...directionStack]))
+                counter++
+            }
+            if (counter < 2 && nextMoves.right) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.right], nextMoves.right, directionStack))
+            }
+        } else if (directionStack[0] === 'W') {
+            let counter = 0
+            if (nextMoves.top && !this._isDirectionAlreadyTaken(directionStack, 'N')) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.top], nextMoves.top, ['N', ...directionStack]))
+                counter++
+            }
+            if (nextMoves.bottom && !this._isDirectionAlreadyTaken(directionStack, 'S')) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.bottom], nextMoves.bottom, ['S', ...directionStack]))
+                counter++
+            }
+            if (counter < 2 && nextMoves.left) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.left], nextMoves.left, directionStack))
+            }
+        } else if (directionStack[0] === 'N') {
+            let counter = 0
+            if (nextMoves.left && !this._isDirectionAlreadyTaken(directionStack, 'W')) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.left], nextMoves.left, ['W', ...directionStack]))
+                counter++
+            }
+            if (nextMoves.right && !this._isDirectionAlreadyTaken(directionStack, 'E')) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.right], nextMoves.right, ['E', ...directionStack]))
+                counter++
+            }
+            if (counter < 2 && nextMoves.top) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.top], nextMoves.top, directionStack))
+            }
+        } else if (directionStack[0] === 'S') {
+            let counter = 0
+            if (nextMoves.left && !this._isDirectionAlreadyTaken(directionStack, 'W')) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.left], nextMoves.left, ['W', ...directionStack]))
+                counter++
+            }
+            if (nextMoves.right && !this._isDirectionAlreadyTaken(directionStack,'E')) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.right], nextMoves.right, ['E', ...directionStack]))
+                counter++
+            }
+            if (counter < 2 && nextMoves.bottom) {
+                paths.push(...this._getSquares([...previousPoints, nextMoves.bottom], nextMoves.bottom, directionStack))
+            }
+        }
         return paths
+    }
+
+    _isDirectionAlreadyTaken(array, value) {
+        // Last element can be duplicated
+        return array.slice(0, -1).includes(value)
     }
 
     /*
