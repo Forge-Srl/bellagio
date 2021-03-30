@@ -22,10 +22,10 @@ class Board {
         const lastSegment = this.segments[this.segments.length - 1]
         const segmentPoints = lastSegment.segmentPoints
 
-        const horizontal1 = this._getSquares([], segmentPoints[1], ['W'])
-        const horizontal2 = this._getSquares([], segmentPoints[1], ['E'])
-        const vertical1 = this._getSquares([], segmentPoints[1], ['N'])
-        const vertical2 = this._getSquares([], segmentPoints[1], ['S'])
+        const horizontal1 = this._getSquaredPaths([], segmentPoints[1], ['W'])
+        const horizontal2 = this._getSquaredPaths([], segmentPoints[1], ['E'])
+        const vertical1 = this._getSquaredPaths([], segmentPoints[1], ['N'])
+        const vertical2 = this._getSquaredPaths([], segmentPoints[1], ['S'])
         // ...
         // escludere la direzione inversa al segmento finale
 
@@ -40,10 +40,10 @@ class Board {
             (segment.startPoint.x === point.x - 1 && segment.startPoint.y === point.y && segment.isHorizontal) ||
             (segment.startPoint.x === point.x && segment.startPoint.y === point.y - 1 && segment.isVertical))
 
-        const maybeTop = adjacentList.find(adjacentSegment => adjacentSegment.y < point.y)
-        const maybeBottom = adjacentList.find(adjacentSegment => adjacentSegment.y === point.y && adjacentSegment.isVertical)
-        const maybeLeft = adjacentList.find(adjacentSegment => adjacentSegment.x < point.x)
-        const maybeRight = adjacentList.find(adjacentSegment => adjacentSegment.x === point.x && adjacentSegment.isHorizontal)
+        const maybeTop = adjacentList.find(adjacentSegment => adjacentSegment.startPoint.y < point.y)
+        const maybeBottom = adjacentList.find(adjacentSegment => adjacentSegment.startPoint.y === point.y && adjacentSegment.isVertical)
+        const maybeLeft = adjacentList.find(adjacentSegment => adjacentSegment.startPoint.x < point.x)
+        const maybeRight = adjacentList.find(adjacentSegment => adjacentSegment.startPoint.x === point.x && adjacentSegment.isHorizontal)
 
         return {
             top: maybeTop ? maybeTop.startPoint : undefined,
@@ -53,7 +53,7 @@ class Board {
         }
     }
 
-    _getSquares(previousPoints, currentPoint, directionStack) {
+    _getSquaredPaths(previousPoints, currentPoint, directionStack) {
         if (previousPoints.length && previousPoints[0].x === currentPoint.x && previousPoints[0].y === currentPoint.y) {
             return [{path: previousPoints}]
         }
@@ -61,57 +61,56 @@ class Board {
         const nextMoves = this._getAdjacentPoints(currentPoint)
         const paths = []
 
-        if (directionStack[0] === 'E') {
-            let counter = 0
+        const currentDirection = directionStack[0]
+        const currentPoints = [...previousPoints, currentPoint]
+        let turnsCount = 0
+        if (currentDirection === 'E') {
             if (nextMoves.top && !this._isDirectionAlreadyTaken(directionStack, 'N')) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.top], nextMoves.top, ['N', ...directionStack]))
-                counter++
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.top, ['N', ...directionStack]))
+                turnsCount++
             }
             if (nextMoves.bottom && !this._isDirectionAlreadyTaken(directionStack, 'S')) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.bottom], nextMoves.bottom, ['S', ...directionStack]))
-                counter++
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.bottom, ['S', ...directionStack]))
+                turnsCount++
             }
-            if (counter < 2 && nextMoves.right) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.right], nextMoves.right, directionStack))
+            if (turnsCount < 2 && nextMoves.right) {
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.right, directionStack))
             }
-        } else if (directionStack[0] === 'W') {
-            let counter = 0
+        } else if (currentDirection === 'W') {
             if (nextMoves.top && !this._isDirectionAlreadyTaken(directionStack, 'N')) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.top], nextMoves.top, ['N', ...directionStack]))
-                counter++
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.top, ['N', ...directionStack]))
+                turnsCount++
             }
             if (nextMoves.bottom && !this._isDirectionAlreadyTaken(directionStack, 'S')) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.bottom], nextMoves.bottom, ['S', ...directionStack]))
-                counter++
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.bottom, ['S', ...directionStack]))
+                turnsCount++
             }
-            if (counter < 2 && nextMoves.left) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.left], nextMoves.left, directionStack))
+            if (turnsCount < 2 && nextMoves.left) {
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.left, directionStack))
             }
-        } else if (directionStack[0] === 'N') {
-            let counter = 0
+        } else if (currentDirection === 'N') {
             if (nextMoves.left && !this._isDirectionAlreadyTaken(directionStack, 'W')) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.left], nextMoves.left, ['W', ...directionStack]))
-                counter++
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.left, ['W', ...directionStack]))
+                turnsCount++
             }
             if (nextMoves.right && !this._isDirectionAlreadyTaken(directionStack, 'E')) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.right], nextMoves.right, ['E', ...directionStack]))
-                counter++
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.right, ['E', ...directionStack]))
+                turnsCount++
             }
-            if (counter < 2 && nextMoves.top) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.top], nextMoves.top, directionStack))
+            if (turnsCount < 2 && nextMoves.top) {
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.top, directionStack))
             }
-        } else if (directionStack[0] === 'S') {
-            let counter = 0
+        } else if (currentDirection === 'S') {
             if (nextMoves.left && !this._isDirectionAlreadyTaken(directionStack, 'W')) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.left], nextMoves.left, ['W', ...directionStack]))
-                counter++
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.left, ['W', ...directionStack]))
+                turnsCount++
             }
             if (nextMoves.right && !this._isDirectionAlreadyTaken(directionStack,'E')) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.right], nextMoves.right, ['E', ...directionStack]))
-                counter++
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.right, ['E', ...directionStack]))
+                turnsCount++
             }
-            if (counter < 2 && nextMoves.bottom) {
-                paths.push(...this._getSquares([...previousPoints, nextMoves.bottom], nextMoves.bottom, directionStack))
+            if (turnsCount < 2 && nextMoves.bottom) {
+                paths.push(...this._getSquaredPaths(currentPoints, nextMoves.bottom, directionStack))
             }
         }
         return paths
