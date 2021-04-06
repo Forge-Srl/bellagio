@@ -5,34 +5,69 @@ class Board {
     constructor(height = 10, width = 10) {
         this.size = {height, width}
         this.segments = []
+        this.conqueredSquares = []
+    }
+
+    get points() {
+        //TODO
+    }
+
+    get gameOver() {
+        //TODO
+    }
+
+    /**
+     * @param segment {Segment}
+     * */
+    canAddSegment(segment) {
+        const point = segment.startPoint
+        return segment.isValid(this.size.width, this.size.height) &&
+            !this.segments.find(otherSegment => otherSegment.startPoint.x === point.x &&
+                otherSegment.startPoint.y === point.y && otherSegment.direction === segment.direction) &&
+            !this.conqueredSquares.find(square => point.x >= square.left && point.x < square.right &&
+                point.y >= square.top && point.y < square.bottom)
     }
 
     /**
      * @param segment {Segment}
      * */
     addSegment(segment) {
-        if (!segment.isValid(this.size.width, this.size.height)) {
-            throw new Error('Invalid segment')
+        if (!this.canAddSegment(segment)) {
+            throw Error('Invalid segment')
         }
 
         this.segments.push(segment)
+        this.conqueredSquares.push(...this._computeSquares().map(square => Object.assign(square, {player: segment.player})))
     }
 
-    get squares() {
+    _computeSquares() {
         const lastSegment = this.segments[this.segments.length - 1]
-        const segmentPoints = lastSegment.segmentPoints
 
-        const horizontal1 = this._getSquaredPaths([], segmentPoints[1], ['W'])
-        const horizontal2 = this._getSquaredPaths([], segmentPoints[1], ['E'])
-        const vertical1 = this._getSquaredPaths([], segmentPoints[1], ['N'])
-        const vertical2 = this._getSquaredPaths([], segmentPoints[1], ['S'])
-        // ...
-        // escludere la direzione inversa al segmento finale
+        return this._getConqueredSquaredPaths(
+            this._getSquaredPaths([], lastSegment.startPoint, [lastSegment.isHorizontal ? 'W' : 'N']))
+    }
 
-
-        for (const segment of this.segments) {
-
-        }
+    _getConqueredSquaredPaths(squaredPaths) {
+        return squaredPaths
+            .map(square => {
+                const xs = square.path.map(point => point.x)
+                const ys = square.path.map(point => point.y)
+                return {left: Math.min(...xs), right: Math.max(...xs), top: Math.min(...ys), bottom: Math.max(...ys)}
+            })
+            .filter(square => {
+                for (const segment of this.segments) {
+                    if (segment.isHorizontal) {
+                        if (segment.startPoint.x >= square.left && segment.startPoint.x < square.right &&
+                            segment.startPoint.y > square.top && segment.startPoint.y < square.bottom) {
+                            return false
+                        }
+                    } else if (segment.startPoint.x > square.left && segment.startPoint.x < square.right &&
+                        segment.startPoint.y >= square.top && segment.startPoint.y < square.bottom) {
+                        return false
+                    }
+                }
+                return true
+            })
     }
 
     _getAdjacentPoints(point) {
@@ -47,7 +82,7 @@ class Board {
 
         return {
             top: maybeTop ? maybeTop.startPoint : undefined,
-            bottom: maybeBottom ? maybeBottom.segmentPoints[1]: undefined,
+            bottom: maybeBottom ? maybeBottom.segmentPoints[1] : undefined,
             left: maybeLeft ? maybeLeft.startPoint : undefined,
             right: maybeRight ? maybeRight.segmentPoints[1] : undefined,
         }
@@ -105,7 +140,7 @@ class Board {
                 paths.push(...this._getSquaredPaths(currentPoints, nextMoves.left, ['W', ...directionStack]))
                 turnsCount++
             }
-            if (nextMoves.right && !this._isDirectionAlreadyTaken(directionStack,'E')) {
+            if (nextMoves.right && !this._isDirectionAlreadyTaken(directionStack, 'E')) {
                 paths.push(...this._getSquaredPaths(currentPoints, nextMoves.right, ['E', ...directionStack]))
                 turnsCount++
             }
@@ -120,23 +155,6 @@ class Board {
         // Last element can be duplicated
         return array.slice(0, -1).includes(value)
     }
-
-    /*
-    *
-Algoritmo di ricerca rettangoli:
-- prediligere il cambio di direzione
-- c'è uno stack di direzioni da intraprendere che
-	- dipende dalle direzioni possibili [DX, B, SX, A DX]
-	- si consuma ad ogni cambio di direzioni
-	- la prima direzione deve essere duplicata in coda
-- ad ogni nodo con più direzioni possibili devo branchare ricorsivamente
-	- portandomi dietro lo stack delle direzioni.
-	- ritornando le soluzioni che trovo come array
-- le soluzioni ritornate vanno controllate perchè
-	- possono essere duplicate
-	- possono contenere segmenti e quindi non sono valide
-    *
-    * */
 }
 
 module.exports = {Board}
