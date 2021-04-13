@@ -1,8 +1,10 @@
+const {Board} = require('./Board')
+
 class Game {
 
     // @bionic () => String
     static run() {
-        return 'go bellagio!'
+        let board = new Board();
     }
 }
 

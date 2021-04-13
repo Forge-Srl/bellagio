@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bellagio</title>
+    <script src="bellagio.js"></script>
+    <style>
+        body {
+            --border: 5px solid black;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            width: fit-content;
+            margin: 0 auto;
+            border: var(--border);
+        }
+
+        .row {
+            flex-grow: 1;
+
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+
+        .cell {
+            width: 4em;
+            height: 4em;
+
+            background-color: yellowgreen;
+            border: var(--border);
+        }
+
+        .cell.border-left {
+            border-left-color: red;
+        }
+
+        .cell.border-right {
+            border-right-color: red;
+        }
+
+        .cell.border-top {
+            border-top-color: red;
+        }
+
+        .cell.border-bottom {
+            border-bottom-color: red;
+        }
+    </style>
+</head>
+<body>
+</body>
+</html>
