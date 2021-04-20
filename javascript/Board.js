@@ -8,12 +8,26 @@ class Board {
         this.conqueredSquares = []
     }
 
-    get points() {
-        //TODO
+    get isGameOver() {
+        const totalArea = (this.size.height - 1) * (this.size.width - 1)
+        const conqueredArea = this.conqueredSquares.reduce((points, currentSquare) => {
+            const width = currentSquare.right - currentSquare.left
+            const height = currentSquare.bottom - currentSquare.top
+            return points + width * height
+        }, 0)
+
+        return totalArea === conqueredArea
     }
 
-    get gameOver() {
-        //TODO
+    getPoints(player) {
+        return this.conqueredSquares
+            .filter(square => square.player === player)
+            .reduce((points, currentSquare) => {
+                const width = currentSquare.right - currentSquare.left
+                const height = currentSquare.bottom - currentSquare.top
+                const area = width * height
+                return points + area
+            }, 0)
     }
 
     /**
@@ -54,7 +68,7 @@ class Board {
                 const ys = square.path.map(point => point.y)
                 return {left: Math.min(...xs), right: Math.max(...xs), top: Math.min(...ys), bottom: Math.max(...ys)}
             })
-            .filter(square => {
+            .filter(square => { // filter out squares containing segments
                 for (const segment of this.segments) {
                     if (segment.isHorizontal) {
                         if (segment.startPoint.x >= square.left && segment.startPoint.x < square.right &&
@@ -63,6 +77,15 @@ class Board {
                         }
                     } else if (segment.startPoint.x > square.left && segment.startPoint.x < square.right &&
                         segment.startPoint.y >= square.top && segment.startPoint.y < square.bottom) {
+                        return false
+                    }
+                }
+                return true
+            })
+            .filter(square => { // filter out squares already conquered
+                for (const conqueredSquare of this.conqueredSquares) {
+                    if (conqueredSquare.left === square.left && conqueredSquare.right === square.right &&
+                        conqueredSquare.top === square.top && conqueredSquare.bottom === square.bottom) {
                         return false
                     }
                 }

@@ -6,7 +6,11 @@
     <script src="bellagio.js"></script>
     <style>
         body {
-            --border: 5px solid black;
+            --border: 5px solid grey;
+            --player1: rgba(255, 0, 0, 1);
+            --player1-back: rgba(255, 0, 0, 0.6);
+            --player2: rgba(0, 0, 255, 1);
+            --player2-back: rgba(0, 0, 255, 0.6);
         }
 
         .container {
@@ -16,6 +20,8 @@
             width: fit-content;
             margin: 0 auto;
             border: var(--border);
+
+            background-color: lightgray;
         }
 
         .row {
@@ -30,24 +36,42 @@
             width: 4em;
             height: 4em;
 
-            background-color: yellowgreen;
             border: var(--border);
         }
 
-        .cell.border-left {
-            border-left-color: red;
+        .cell.player-1 {
+            background-color: var(--player1-back);
+        }
+        .cell.player-2 {
+            background-color: var(--player2-back);
         }
 
-        .cell.border-right {
-            border-right-color: red;
+        .cell.border-left-player-1 {
+            border-left-color: var(--player1);
+        }
+        .cell.border-left-player-2 {
+            border-left-color: var(--player2);
         }
 
-        .cell.border-top {
-            border-top-color: red;
+        .cell.border-right-player-1 {
+            border-right-color: var(--player1);
+        }
+        .cell.border-right-player-2 {
+            border-right-color: var(--player2);
         }
 
-        .cell.border-bottom {
-            border-bottom-color: red;
+        .cell.border-top-player-1 {
+            border-top-color: var(--player1);
+        }
+        .cell.border-top-player-2 {
+            border-top-color: var(--player2);
+        }
+
+        .cell.border-bottom-player-1 {
+            border-bottom-color: var(--player1);
+        }
+        .cell.border-bottom-player-2 {
+            border-bottom-color: var(--player2);
         }
     </style>
 </head>

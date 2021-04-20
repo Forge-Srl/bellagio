@@ -177,6 +177,24 @@ describe('Board', () => {
         }])).toStrictEqual([])
     })
 
+    test('_getConqueredSquaredPaths already conquered square', () => {
+        const board = new Board()
+        board.segments = [
+            new Segment(undefined, {x: 1, y: 1}, Segment.horizontal),
+            new Segment(undefined, {x: 1, y: 1}, Segment.vertical),
+            new Segment(undefined, {x: 2, y: 1}, Segment.vertical),
+            new Segment(undefined, {x: 1, y: 2}, Segment.horizontal),
+            new Segment(undefined, {x: 2, y: 1}, Segment.horizontal),
+        ]
+        board.conqueredSquares = [
+            {left: 1, right: 2, top: 1, bottom: 2, player: 'Luigi'}
+        ]
+
+        expect(board._getConqueredSquaredPaths([{
+            path: [{x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 2, y: 1}],
+        }])).toStrictEqual([])
+    })
+
     test('_getAdjacentPoints 1 point on right', () => {
         const board = new Board()
         board.segments = [new Segment(undefined, {x: 0, y: 0}, Segment.horizontal)]

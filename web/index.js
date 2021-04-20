@@ -1,4 +1,4 @@
-const {Board} = require('../javascript/Board')
+const {Game} = require('../javascript/Game')
 const {Segment} = require('../javascript/Segment')
 
 const getClickLocation = (event) => {
@@ -14,62 +14,104 @@ const getClickLocation = (event) => {
     return horizontalDelta <= verticalDelta ? horizontalProximity : verticalProximity
 }
 
-const updateUI = (container, board) => {
-    board.segments.forEach(segment => {
-        const y = segment.startPoint.y
-        const x = segment.startPoint.x
-
-        if (segment.isHorizontal) {
-            if (y === board.size.height - 1) {
-                container.querySelector(`.row-${y-1}.col-${x}`).classList.add('border-bottom')
-            } else {
-                container.querySelector(`.row-${y}.col-${x}`).classList.add('border-top')
-                if (y > 0)
-                    container.querySelector(`.row-${y-1}.col-${x}`).classList.add('border-bottom')
-            }
-        } else {
-            if (x === board.size.width - 1) {
-                container.querySelector(`.row-${y}.col-${x-1}`).classList.add('border-right')
-            } else {
-                container.querySelector(`.row-${y}.col-${x}`).classList.add('border-left')
-                if (x > 0)
-                    container.querySelector(`.row-${y}.col-${x-1}`).classList.add('border-right')
-            }
-        }
-    })
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-    const board = new Board()
-
+    const game = new Game()
     const container = document.createElement('div')
     container.classList.add('container')
     document.body.append(container)
 
-    for (let row = 0; row < board.size.height - 1; row++) {
-        const rowElement = document.createElement('div')
-        rowElement.classList.add('row')
-        for (let col = 0; col < board.size.width - 1; col++) {
-            const cell = document.createElement('div')
-            cell.classList.add('cell', `row-${row}`, `col-${col}`)
-            rowElement.append(cell)
-
-            cell.addEventListener('click', (event) => {
-                const location = getClickLocation(event)
-                const player = 'John Doe'
-                if (location === 'top') {
-                    board.addSegment(new Segment(player, {x: col, y: row}, Segment.horizontal))
-                } else if (location === 'bottom') {
-                    board.addSegment(new Segment(player, {x: col, y: row + 1}, Segment.horizontal))
-                } else if (location === 'left') {
-                    board.addSegment(new Segment(player, {x: col, y: row}, Segment.vertical))
-                } else if (location === 'right') {
-                    board.addSegment(new Segment(player, {x: col + 1, y: row}, Segment.vertical))
-                }
-
-                updateUI(container, board)
-            })
-        }
-        container.append(rowElement)
+    const renderPoints = () => {
+        const playersBox = container.querySelector('.playersBox')
+        let pointsHTML = ''
+        game.points.forEach((points, player) => {
+            pointsHTML += player.name + ' ' + points + '<br>'
+        })
+        playersBox.innerHTML = pointsHTML
     }
+
+    game.onGameStart(board => {
+        container.innerHTML = ''
+
+        const playersBox = document.createElement('div')
+        playersBox.classList.add('playersBox')
+        container.append(playersBox)
+        renderPoints()
+
+        const boardWrapper = document.createElement('div')
+        container.append(boardWrapper)
+
+        for (let row = 0; row < board.size.height - 1; row++) {
+            const rowElement = document.createElement('div')
+            rowElement.classList.add('row')
+            for (let col = 0; col < board.size.width - 1; col++) {
+                const cell = document.createElement('div')
+                cell.classList.add('cell', `row-${row}`, `col-${col}`)
+                rowElement.append(cell)
+
+                cell.addEventListener('click', (event) => {
+                    const location = getClickLocation(event)
+
+                    if (location === 'top') {
+                        game.addSegment(col, row, Segment.horizontal)
+                    } else if (location === 'bottom') {
+                        game.addSegment(col, row + 1, Segment.horizontal)
+                    } else if (location === 'left') {
+                        game.addSegment(col, row, Segment.vertical)
+                    } else if (location === 'right') {
+                        game.addSegment(col + 1, row, Segment.vertical)
+                    }
+                })
+            }
+            boardWrapper.append(rowElement)
+        }
+    })
+
+    game.onSegmentAdded((board, addedSegment) => {
+        renderPoints()
+
+        board.segments.forEach(segment => {
+            const y = segment.startPoint.y
+            const x = segment.startPoint.x
+
+            const playerClass = segment.player === game.players[0] ? 'player-1' : 'player-2'
+
+            if (segment.isHorizontal) {
+                if (y === board.size.height - 1) {
+                    container.querySelector(`.row-${y - 1}.col-${x}`).classList.add(`border-bottom-${playerClass}`)
+                } else {
+                    container.querySelector(`.row-${y}.col-${x}`).classList.add(`border-top-${playerClass}`)
+                    if (y > 0)
+                        container.querySelector(`.row-${y - 1}.col-${x}`).classList.add(`border-bottom-${playerClass}`)
+                }
+            } else {
+                if (x === board.size.width - 1) {
+                    container.querySelector(`.row-${y}.col-${x - 1}`).classList.add(`border-right-${playerClass}`)
+                } else {
+                    container.querySelector(`.row-${y}.col-${x}`).classList.add(`border-left-${playerClass}`)
+                    if (x > 0)
+                        container.querySelector(`.row-${y}.col-${x - 1}`).classList.add(`border-right-${playerClass}`)
+                }
+            }
+        })
+
+        board.conqueredSquares.forEach(square => {
+            const playerClass = square.player === game.players[0] ? 'player-1' : 'player-2'
+
+            for (let col = square.left; col < square.right; col++) {
+                for (let row = square.top; row < square.bottom; row++) {
+                    container.querySelector(`.row-${row}.col-${col}`).classList.add(playerClass)
+                }
+            }
+        })
+    })
+
+    game.onGameOver(() => {
+        setTimeout(() => {
+            const points = game.points
+            const maxPoint = Math.max(...points.values())
+            const playerName = [...points].find(kvp => kvp[1] === maxPoint)[0].name
+            alert(`${playerName} won!`)}, 0)
+    })
+
+    game.startGame()
 })
