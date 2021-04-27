@@ -1,12 +1,18 @@
 const {Segment} = require('./Segment')
+const {Size} = require('./Size')
+const {ConqueredSquare} = require('./ConqueredSquare')
 
 class Board {
 
     constructor(height = 10, width = 10) {
-        this.size = {height, width}
+        this.size = new Size(width, height)
         this.segments = []
         this.conqueredSquares = []
     }
+
+    // @bionic get size Size
+    // @bionic get segments Array<Segment>
+    // @bionic get conqueredSquares Array<ConqueredSquare>
 
     get isGameOver() {
         const totalArea = (this.size.height - 1) * (this.size.width - 1)
@@ -51,7 +57,8 @@ class Board {
         }
 
         this.segments.push(segment)
-        this.conqueredSquares.push(...this._computeSquares().map(square => Object.assign(square, {player: segment.player})))
+        this.conqueredSquares.push(...this._computeSquares()
+            .map(square => new ConqueredSquare(segment.player, square.left, square.top, square.right, square.bottom)))
     }
 
     _computeSquares() {

@@ -11,7 +11,7 @@ module.exports = {
     outputMode: "development",
     hostProjects: [{
         language: "java",
-        projectPath: path.resolve(__dirname, "../java"),
+        projectPath: path.resolve(__dirname, "../android/app"),
         srcDirName: "src",
         basePackage: "srl.forge.bellagio",
         hostPackage: "js",

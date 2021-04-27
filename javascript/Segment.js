@@ -1,9 +1,13 @@
+require('./Point')
+
 class Segment {
 
+    // @bionic String
     static get horizontal() {
         return 'horizontal'
     }
 
+    // @bionic String
     static get vertical() {
         return 'vertical'
     }
@@ -18,10 +22,14 @@ class Segment {
         this.direction = direction
     }
 
+    // @bionic get startPoint Point
+
+    // @bionic Bool
     get isVertical() {
         return this.direction === Segment.vertical
     }
 
+    // @bionic Bool
     get isHorizontal() {
         return this.direction === Segment.horizontal
     }

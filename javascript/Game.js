@@ -1,12 +1,18 @@
 const {Board} = require('./Board')
+const {Point} = require('./Point')
 const {Segment} = require('./Segment')
 const {Player} = require('./Player')
+const {PlayersPoints} = require('./PlayersPoints')
 
 class Game {
 
+    // @bionic ()
     constructor() {
     }
 
+    // @bionic get players Array<Player>
+
+    // @bionic Player
     get currentPlayer() {
         return this.players[this.turnCounter % this.players.length]
     }
@@ -34,30 +40,25 @@ class Game {
         this.gameStartCallback(this.board)
     }
 
-    // @bionic (Integer, Integer, String) => Void
+    // @bionic (Int, Int, String) => Void
     addSegment(x, y, direction) {
-        const segment = new Segment(this.currentPlayer, {x, y}, direction)
+        const segment = new Segment(this.currentPlayer, new Point(x, y), direction)
         this.board.addSegment(segment)
         this.segmentAddedCallback(this.board, segment)
         this.turnCounter++
 
         if (this.board.isGameOver) {
-            this.gameOverCallback(this.winningPlayer)
+            this.gameOverCallback(this.points.winningPlayer)
         }
     }
 
+    // @bionic PlayersPoints
     get points() {
-        const points = new Map()
+        const points = new PlayersPoints()
         for (const player of this.players) {
             points.set(player, this.board.getPoints(player))
         }
         return points
-    }
-
-    get winningPlayer() {
-        const points = this.points
-        const maxPoint = Math.max(...points.values())
-        return [...points].find(kvp => kvp[1] === maxPoint)[0]
     }
 }
 
