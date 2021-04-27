@@ -16,7 +16,7 @@ class Game {
         this.gameStartCallback = callback
     }
 
-    // @bionic (() => Void) => Void
+    // @bionic ((Player) => Void) => Void
     onGameOver(callback) {
         this.gameOverCallback = callback
     }
@@ -42,7 +42,7 @@ class Game {
         this.turnCounter++
 
         if (this.board.isGameOver) {
-            this.gameOverCallback()
+            this.gameOverCallback(this.winningPlayer)
         }
     }
 
@@ -52,6 +52,12 @@ class Game {
             points.set(player, this.board.getPoints(player))
         }
         return points
+    }
+
+    get winningPlayer() {
+        const points = this.points
+        const maxPoint = Math.max(...points.values())
+        return [...points].find(kvp => kvp[1] === maxPoint)[0]
     }
 }
 

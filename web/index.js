@@ -105,12 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     })
 
-    game.onGameOver(() => {
+    game.onGameOver((player) => {
         setTimeout(() => {
-            const points = game.points
-            const maxPoint = Math.max(...points.values())
-            const playerName = [...points].find(kvp => kvp[1] === maxPoint)[0].name
-            alert(`${playerName} won!`)}, 0)
+            alert(`${player.name} won!`)}, 0)
     })
 
     game.startGame()
