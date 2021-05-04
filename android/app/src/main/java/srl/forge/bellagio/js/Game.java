@@ -79,8 +79,8 @@ public class Game extends BjsObject {
         bjsCall("onSegmentAdded", bjs.putFunc(nativeFunc_bjs0, jsFunc_bjs1));
     }
     
-    public void startGame() {
-        bjsCall("startGame");
+    public void startGame(Integer width, Integer height) {
+        bjsCall("startGame", bjs.putPrimitive(width), bjs.putPrimitive(height));
     }
     
     public void addSegment(Integer x, Integer y, String direction) {

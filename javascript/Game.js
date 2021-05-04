@@ -32,11 +32,11 @@ class Game {
         this.segmentAddedCallback = callback
     }
 
-    // @bionic () => Void
-    startGame() {
+    // @bionic (Int, Int) => Void
+    startGame(width, height) {
         this.players = [new Player('John Doe'), new Player('Alan Smith')]
         this.turnCounter = 0
-        this.board = new Board()
+        this.board = new Board(height, width)
         this.gameStartCallback(this.board)
     }
 

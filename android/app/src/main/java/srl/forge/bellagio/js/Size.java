@@ -1,10 +1,13 @@
 package srl.forge.bellagio.js;
 
-import bionic.js.Bjs;
-import bionic.js.BjsObject;
-import bionic.js.BjsObjectTypeInfo;
-import bionic.js.BjsTypeInfo;
 import jjbridge.api.runtime.JSReference;
+import jjbridge.api.value.strategy.FunctionCallback;
+import bionic.js.Bjs;
+import bionic.js.BjsTypeInfo;
+import bionic.js.BjsObjectTypeInfo;
+import bionic.js.Lambda;
+import java.util.Date;
+import bionic.js.BjsObject;
 
 @BjsTypeInfo.BjsLocation(project = "Bellagio", module = "Size")
 public class Size extends BjsObject {
