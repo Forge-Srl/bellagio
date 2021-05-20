@@ -10,5 +10,7 @@ class App : Application() {
         super.onCreate()
 
         BjsProject.setJsEngine(V8Engine())
+        
+        BjsProject.enableInspector(9090)
     }
 }

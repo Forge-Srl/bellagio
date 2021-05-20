@@ -41,6 +41,10 @@ public class Segment extends BjsObject {
         return bjs.getObj(bjsGetProperty("startPoint"), Point.bjsFactory, Point.class);
     }
     
+    public Player player() {
+        return bjs.getObj(bjsGetProperty("player"), Player.bjsFactory, Player.class);
+    }
+    
     private static final JSReference bjsClass = BjsObjectTypeInfo.get(Segment.class).bjsClass();
     public static final Bjs bjs = BjsObjectTypeInfo.get(Segment.class).bjsLocator.get();
     public static final Bjs.JSReferenceConverter<Segment> bjsFactory = Segment::new;

@@ -1,4 +1,5 @@
 require('./Point')
+require('./Player')
 
 class Segment {
 
@@ -23,6 +24,7 @@ class Segment {
     }
 
     // @bionic get startPoint Point
+    // @bionic get player Player
 
     // @bionic Bool
     get isVertical() {

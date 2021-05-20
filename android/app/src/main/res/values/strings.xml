@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Bellagio</string>
+    <string name="game_over">Game over</string>
+    <string name="player_won">%s won!</string>
 </resources>
