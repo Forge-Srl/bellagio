@@ -65,7 +65,7 @@ eval("class Player {\n\n    constructor(name) {\n        this.name = name\n    }
   \**************************/
 /***/ ((module) => {
 
-eval("class PlayersPoints {\n\n    constructor() {\n        this.points = new Map()\n    }\n\n    // @bionic (Player) => Int\n    get(player) {\n        this.points.get(player)\n    }\n\n    set(player, points) {\n        this.points.set(player, points)\n    }\n\n    get winningPlayer() {\n        const points = this.points\n        const maxPoint = Math.max(...points.values())\n        return [...points].find(kvp => kvp[1] === maxPoint)[0]\n    }\n\n    forEach(...args) {\n        this.points.forEach(...args)\n    }\n}\n\nmodule.exports = {PlayersPoints}\n\n//# sourceURL=webpack://bellagio/./PlayersPoints.js?");
+eval("class PlayersPoints {\n\n    constructor() {\n        this.points = new Map()\n    }\n\n    // @bionic (Player) => Int\n    get(player) {\n        return this.points.get(player)\n    }\n\n    set(player, points) {\n        this.points.set(player, points)\n    }\n\n    get winningPlayer() {\n        const points = this.points\n        const maxPoint = Math.max(...points.values())\n        return [...points].find(kvp => kvp[1] === maxPoint)[0]\n    }\n\n    forEach(...args) {\n        this.points.forEach(...args)\n    }\n}\n\nmodule.exports = {PlayersPoints}\n\n//# sourceURL=webpack://bellagio/./PlayersPoints.js?");
 
 /***/ }),
 

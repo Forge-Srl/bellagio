@@ -6,7 +6,7 @@ class PlayersPoints {
 
     // @bionic (Player) => Int
     get(player) {
-        this.points.get(player)
+        return this.points.get(player)
     }
 
     set(player, points) {

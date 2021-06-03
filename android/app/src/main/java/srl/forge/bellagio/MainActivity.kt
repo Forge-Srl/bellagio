@@ -3,7 +3,6 @@ package srl.forge.bellagio
 import android.graphics.Color
 import android.graphics.drawable.ShapeDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -49,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             showWinner(player)
             null
         }
-        game.startGame(5, 5)
+        game.startGame(10, 5)
     }
 
     private fun setupPlayers(
@@ -77,15 +76,15 @@ class MainActivity : AppCompatActivity() {
         board: Board,
         playerColors: Map<String, Int>
     ) {
-        val minSize = minOf(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels) /
-                (board.size().width() - 1)
+        val cellSize = minOf(resources.displayMetrics.widthPixels / (board.size().width() - 1),
+            resources.displayMetrics.heightPixels / (board.size().height() - 1))
         repeat(board.size().height() - 1) { row ->
             val rowView = LinearLayout(this)
             boardContainer.addView(rowView)
             repeat(board.size().width() - 1) { col ->
                 val cell = View(this)
                 val cellBackground = CellBackground(resources, playerColors)
-                cell.layoutParams = LinearLayout.LayoutParams(minSize, minSize)
+                cell.layoutParams = LinearLayout.LayoutParams(cellSize, cellSize)
                 cell.background = ShapeDrawable(cellBackground)
                 cell.tag = cellBackground
                 rowView.addView(cell)
@@ -93,7 +92,6 @@ class MainActivity : AppCompatActivity() {
                     if (event.action != MotionEvent.ACTION_DOWN) return@setOnTouchListener false
                     val clickLocation = getClickLocation(v, event)
 
-                    Log.e("AAAAA", "col = $col, row = $row, clickLocation = $clickLocation")
                     try {
                         when (clickLocation) {
                             "top" -> game.addSegment(col, row, Segment.horizontal())
