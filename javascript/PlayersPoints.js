@@ -15,6 +15,9 @@ class PlayersPoints {
 
     get winningPlayer() {
         const points = this.points
+        if (points.size === 0)
+            return undefined
+
         const maxPoint = Math.max(...points.values())
         return [...points].find(kvp => kvp[1] === maxPoint)[0]
     }
